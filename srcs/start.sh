@@ -23,6 +23,7 @@ sed -i "s/define( 'DB_USER', 'username_here' );/define( 'DB_USER', 'nathanuser' 
 sed -i "s/define( 'DB_PASSWORD', 'password_here' );/define( 'DB_PASSWORD', 'Str0nGPassword' );/g" /var/www/html/wp-config.php
 sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'localhost' );/g" /var/www/html/wp-config.php
 sed -i "s/define( 'DB_CHARSET', 'utf8' );/define( 'DB_CHARSET', 'utf8' );/g" /var/www/html/wp-config.php
+chown -R www-data:www-data /var/www/html/
 
 #touch /var/www/html/index.php
 #echo "<?php phpinfo();" >> /var/www/html/index.php
