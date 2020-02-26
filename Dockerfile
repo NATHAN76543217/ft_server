@@ -5,8 +5,12 @@ RUN apt-get install -y nginx
 RUN apt-get install -y mariadb-server
 RUN apt-get install -y php php-common php-fpm php-mysql php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip
 RUN apt-get install -y vim
+RUN apt-get install -y wget
+RUN apt-get install -y curl
 
-COPY ./srcs/start.sh ./app/
+COPY ./srcs/start.sh ./app/start.sh
 COPY ./srcs/default ./etc/nginx/sites-enabled/default
+COPY ./srcs/data.sql ./app/data.sql
+COPY ./srcs/nathandemo ./etc/nginx/sites-available/nathandemo 
 #COPY ./srcs/doc.html ./var/www/html/doc.html
 CMD ["/bin/bash", "/app/start.sh"] +
