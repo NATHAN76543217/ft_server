@@ -25,7 +25,4 @@ sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'localhost' );/g"
 sed -i "s/define( 'DB_CHARSET', 'utf8' );/define( 'DB_CHARSET', 'utf8' );/g" /var/www/html/wp-config.php
 chown -R www-data:www-data /var/www/html/
 
-#touch /var/www/html/index.php
-#echo "<?php phpinfo();" >> /var/www/html/index.php
-#cat /var/www/html/index.php
 while true; do sleep 1000; done
