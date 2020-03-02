@@ -48,6 +48,7 @@ server {
         location / {
                 # First attempt to serve request as file, then
                 # as directory, then fall back to displaying a 404.
+                autoindex on;
                 try_files $uri $uri/ =404;
         }
 
@@ -55,7 +56,6 @@ server {
         #
         location ~ \.php$ {
                include snippets/fastcgi-php.conf;
-        #
         #       # With php-fpm (or other unix sockets):
                 fastcgi_pass unix:/run/php/php7.3-fpm.sock;
 }
@@ -87,6 +87,7 @@ server {
 #       index index.html;
 #
 #       location / {
+                autoindex on;
 #               try_files $uri $uri/ =404;
 #       }
 #}

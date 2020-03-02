@@ -1,7 +1,7 @@
 
 
 
-index.php
+$cfg['blowfish_secret'] = 'STRINGOFTHIRTYTWORANDOMCHARACTERS'; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */
 
 
 
