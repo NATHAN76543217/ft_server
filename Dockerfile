@@ -12,6 +12,7 @@ RUN apt-get install -y net-tools
 
 COPY    ./srcs/start.sh ./app/start.sh
 
+
 #install nginx configuration
 RUN     rm ./etc/nginx/sites-available/default ./etc/nginx/sites-enabled/default
 COPY    ./srcs/configs/nathandemo ./etc/nginx/sites-available/default
@@ -24,4 +25,5 @@ COPY    ./srcs/sql/conf_php.sql ./app/conf_php.sql
 COPY    ./srcs/doc.html ./var/www/html/doc.html
 EXPOSE  80
 EXPOSE  443
+ENV     autoindex=on
 CMD ["/bin/bash", "/app/start.sh"] +

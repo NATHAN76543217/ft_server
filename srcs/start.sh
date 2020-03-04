@@ -15,8 +15,9 @@ service nginx restart
 
 #telecharger wordpress
 wget https://wordpress.org/latest.tar.gz -P /tmp
-tar xzf /tmp/latest.tar.gz --strip-components=1 -C /var/www/html/
-cp /var/www/html/wp-config{-sample,}.php
+mkdir /var/www/html/wordpress
+tar xzf /tmp/latest.tar.gz --strip-components=1 -C /var/www/html/wordpress
+cp /var/www/html/wordpress/wp-config{-sample,}.php
 
 #generer une cle de secu
 curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/key.txt
@@ -25,11 +26,11 @@ curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/key.txt
 sed -i -e "/^define( 'AUTH_KEY',         'put your unique phrase here' );/r tmp/key.txt" -e "/^define( 'AUTH_KEY',         'put your unique phrase here' );/,/^define( 'NONCE_SALT',       'put your unique phrase here' );/d" /var/www/html/wp-config.php
 
 #definir les parametre de config wordpress
-sed -i "s/define( 'DB_NAME', 'database_name_here' );/define( 'DB_NAME', 'nathandemo' );/g" /var/www/html/wp-config.php
-sed -i "s/define( 'DB_USER', 'username_here' );/define( 'DB_USER', 'nathanuser' );/g" /var/www/html/wp-config.php
-sed -i "s/define( 'DB_PASSWORD', 'password_here' );/define( 'DB_PASSWORD', 'Str0nGPassword' );/g" /var/www/html/wp-config.php
-sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'localhost' );/g" /var/www/html/wp-config.php
-sed -i "s/define( 'DB_CHARSET', 'utf8' );/define( 'DB_CHARSET', 'utf8' );/g" /var/www/html/wp-config.php
+sed -i "s/define( 'DB_NAME', 'database_name_here' );/define( 'DB_NAME', 'nathandemo' );/g" /var/www/html/wordpress/wp-config.php
+sed -i "s/define( 'DB_USER', 'username_here' );/define( 'DB_USER', 'nathanuser' );/g" /var/www/html/wordpress/wp-config.php
+sed -i "s/define( 'DB_PASSWORD', 'password_here' );/define( 'DB_PASSWORD', 'Str0nGPassword' );/g" /var/www/html/wordpress/wp-config.php
+sed -i "s/define( 'DB_HOST', 'localhost' );/define( 'DB_HOST', 'localhost' );/g" /var/www/html/wordpress/wp-config.php
+sed -i "s/define( 'DB_CHARSET', 'utf8' );/define( 'DB_CHARSET', 'utf8' );/g" /var/www/html/wordpress/wp-config.php
 chown -R www-data:www-data /var/www/html/
 
 #telecharge PhpMyAdmin
@@ -47,7 +48,7 @@ echo "\$cfg['TempDir'] = '/var/lib/phpmyadmin/tmp';" >> /usr/share/phpmyadmin/co
 #cree les tables sql necessaires a PMA
 mysql -u root < /usr/share/phpmyadmin/sql/create_tables.sql
 mysql -u root < /app/conf_php.sql
-ln -s /usr/share/phpmyadmin /var/www/html
+ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
 
 
 #generer cle rsa necessaire a la creation d'un certificat
@@ -67,4 +68,7 @@ openssl x509 -req -days 365 -in /var/certs/server.csr -signkey /var/certs/server
 # ln /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 nginx -t
 service nginx restart
+#gerer auto index
+echo autoindex = $(printenv autoindex)
+echo autoindex = $(printenv autoindex) | grep on | wc | sed 's/^[ \t]*//' | cut -f1 -d ' ' 
 while true; do sleep 1000; done
