@@ -35,20 +35,5 @@ server {
 	listen 80;
 	listen [::]:80;
 	server_name localhost;
-
-	# root /var/www/html/;
-	# index index.html index.htm index.nginx-debian.html index.php;
-	
-	# location / {
-	# 	autoindex on;
-    #     try_files $uri $uri/ =404;
-	# }	
-
-	# location ~ \.php$ {
-	# 	include snippets/fastcgi-php.conf;
-	# 	fastcgi_pass unix:/run/php/php7.3-fpm.sock;
-	# 	# fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		
-	# }
 	return 301 https://localhost$request_uri;
 }

@@ -1,4 +1,4 @@
-create database nathandemo;
-CREATE USER nathanuser@localhost IDENTIFIED BY 'Str0nGPassword';
-grant all privileges on nathandemo.* to nathanuser@localhost;
+create database wordpress;
+create USER pma@localhost;
+grant all privileges on wordpress.* to pma@localhost;
 FLUSH privileges;
