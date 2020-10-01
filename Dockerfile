@@ -1,40 +1,46 @@
-FROM debian:10
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y nginx
-RUN apt-get install -y openssl
-RUN apt-get install -y mariadb-server
-RUN apt-get install -y php php-common php-fpm php-mysql php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip
-RUN apt-get install -y vim
-RUN apt-get install -y wget
-RUN apt-get install -y curl
-RUN apt-get install -y net-tools
+FROM debian:buster
 
-COPY    ./srcs/start.sh ./app/start.sh
+RUN apt update \
+    && apt -y upgrade
+# installation des modules necessaires 
+RUN echo "Start install Packages\n" \
+    && apt install -yq nginx mariadb-server wget\
+    && apt install -yq php php-common php-fpm php-mysql php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip \
+    && wget https://files.phpmyadmin.net/phpMyAdmin/4.8.4/phpMyAdmin-4.8.4-all-languages.tar.gz -P /tmp \
+    && wget https://wordpress.org/latest.tar.gz -P /tmp \
+    && wget -O /tmp/wp_key.txt https://api.wordpress.org/secret-key/1.1/salt/ \
+    && mkdir /app
 
+COPY srcs/. .
 
-#install nginx configuration
-RUN     rm ./etc/nginx/sites-available/default ./etc/nginx/sites-enabled/default
-COPY    ./srcs/configs/nathandemo ./etc/nginx/sites-available/default
-RUN     chmod +x /etc/nginx/sites-available/default
-RUN     cp ./etc/nginx/sites-available/default ./etc/nginx/sites-enabled/default
+RUN echo "Lunch all services\n" \
+    && service mysql start \
+    && echo "- Configure MySql" \
+    && mysql -u root < /app/init_WPDB.sql \
+    && echo "- Installing phpmyadmin" \
+    && tar -xf  /tmp/phpMyAdmin-4.8.4-all-languages.tar.gz -C /tmp \
+    && mv /tmp/phpMyAdmin-4.8.4-all-languages /usr/share/phpmyadmin \
+    && echo "- Configuring phpMyAdmin" \
+    && ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin \
+    && mv var/www/html/config.inc.php var/www/html/phpmyadmin/config.inc.php \
+    && chown -R www-data:www-data /var/www/html/phpmyadmin \
+    && sed -i "s~\$cfg\['blowfish_secret'\] = '';~\$cfg\['blowfish_secret'\] = 'STRINGOFTHIRTYTWORANDOMCHARACTERS';~g" /usr/share/phpmyadmin/config.inc.php \
+    && echo "- installing WordPress" \
+    && mkdir /var/www/html/wordpress \
+    && tar xzf /tmp/latest.tar.gz --strip-components=1 -C /var/www/html/wordpress \
+    && echo "- Configuring WordPress" \
+    && mv /var/www/html/wp-config.php /var/www/html/wordpress/wp-config.php \
+    && chown -R www-data:www-data /var/www/html/wordpress \
+    && find /var/www/html/wordpress/ -type d -exec chmod 750 {} \; \
+    && find /var/www/html/wordpress/ -type f -exec chmod 640 {} \; \
+    && sed -i -e "/^define( 'AUTH_KEY',         'put your unique phrase here' );/r /tmp/wp_key.txt" -e "/^define( 'AUTH_KEY',         'put your unique phrase here' );/,/^define( 'NONCE_SALT',       'put your unique phrase here' );/d" /var/www/html/wordpress/wp-config.php \
+    && rm /tmp/wp_key.txt /var/www/html/index.nginx-debian.html
 
-#telecherger wordpress
-RUN wget https://wordpress.org/latest.tar.gz -P /tmp
-RUN mkdir /var/www/html/wordpress
-RUN tar xzf /tmp/latest.tar.gz --strip-components=1 -C /var/www/html/wordpress
-RUN cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+RUN echo "- configurate SSL"\
+    && mkdir /app/ssl \
+    && openssl req -nodes -newkey rsa:2048 -sha256 -keyout /app/ssl/private.key -out /app/ssl/server.csr -subj "/C=FR/ST=69/L=Lyon/O=LECAILLE NATHAN/CN=Localhost" \
+    && openssl x509 -req -days 365 -in /app/ssl/server.csr -signkey /app/ssl/private.key -out /app/ssl/server.crt \
+    && nginx -t
 
-#telecharger phppyadmin
-RUN wget https://files.phpmyadmin.net/phpMyAdmin/4.8.4/phpMyAdmin-4.8.4-all-languages.tar.gz -P /tmp
-RUN tar -xf  /tmp/phpMyAdmin-4.8.4-all-languages.tar.gz -C /tmp
-RUN mv /tmp/phpMyAdmin-4.8.4-all-languages /usr/share/phpmyadmin
-
-#COPY ./srcs/default ./etc/nginx/sites-enabled/default
-COPY    ./srcs/sql/data.sql ./app/data.sql
-COPY    ./srcs/sql/conf_php.sql ./app/conf_php.sql
-COPY    ./srcs/doc.html ./var/www/html/doc.html
-EXPOSE  80
-EXPOSE  443
-ENV     autoindex=on
-CMD ["/bin/bash", "/app/start.sh"]
+ENV AUTOINDEX="ON"
+CMD service mysql restart && service php7.3-fpm start &&  nginx -g 'daemon off;'

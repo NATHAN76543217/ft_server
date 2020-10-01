@@ -1,0 +1,47 @@
+server {
+	
+	listen 443 ssl;
+	listen [::]:443 ssl;
+
+    # # Permet d'activer le SSL / TLS
+    ssl on;
+    # Permet d'activer uniquement le protocole sécurisé (TLS 1.3 et TLS 1.2).
+    # Les protocoles TLS v1.1 et 1.0 sont obsolètes. Les protocoles SSLv2 et SSLv3 sont non sécurisés. Il est déconseillé de les activer.
+	ssl_protocols TLSv1.3 TLSv1.2;
+    # Permet de définir les méthodes de chiffrement à utiliser
+    ssl_ciphers "HIGH:!aNULL:!MD5:!ADH:!DH:!RC4:!RSA";
+    # Permet de forcer le navigateur à utiliser la méthode de chiffrement la plus sécurisée (256 Bits)
+    ssl_prefer_server_ciphers on;
+
+	# Sélection de la chaine complète de certification (concaténation du certificat SSL du domaine,
+	# du certificat SSL intermédiaire puis de la racine)
+	ssl_certificate /app/ssl/server.crt;
+	# Sélection de la clé privée associée au certificat SSL du domaine
+	ssl_certificate_key /app/ssl/private.key;
+
+	root /var/www/html/;
+	autoindex on;
+
+
+   	server_name localhost;
+	index index.php index.html index.htm index.nginx-debian.html;
+	
+	location / {
+        try_files $uri $uri/ =404;
+	}	
+
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+		fastcgi_read_timeout	3600s;
+		fastcgi_param	SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_pass	unix:/run/php/php7.3-fpm.sock;
+	}
+}
+
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	server_name _;
+	return 301 https://localhost$request_uri;
+}

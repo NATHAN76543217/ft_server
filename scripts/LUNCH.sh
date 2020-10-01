@@ -1,2 +1,1 @@
-bash CLEAN.sh
-docker build -t mydoc . && docker run --name mydoc_cont -p 80:80 -p 443:443 mydoc
+docker build -t img_server . && docker run -d -t --name container_server -p 80:80 -p 443:443 img_server
