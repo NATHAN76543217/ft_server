@@ -16,8 +16,18 @@ puis en exécutant le script **/app/MAJ_auto_index.sh**
 
 -----
 
+***Les scripts***
+* LUNCH.sh: Construit une image docker puis lance un container à partir de cet image.
+* RELUNCH.sh: Lance STOP.sh, DELETE.sh puis LUNCH.sh
+* STOP.sh: Stop le container Docker.
+* DELETE.sh: Supprime le container docker ainsi que son image.
+* CLEAN.sh: Supprime toutes les images intermediaires qui ont pu étre créés ainsi que tout les containers.
 
-***Les commandes***:
+-----
+
+# Docker
+
+ ***Les commandes Docker***:
 
 - Crée une image docker: docker build <-path repertoire du dockerfile->
     - -t = permet de donner un nom au container.
@@ -41,7 +51,7 @@ puis en exécutant le script **/app/MAJ_auto_index.sh**
 
 
 
-***dockerfile commands***:
+***Les commandes du dockerfile***:
 
 * FROM: Permet d'indiquer à partir de quel image nous voulons crée notre image.
 * RUN: Permet d'executer des commandes dans le container.
