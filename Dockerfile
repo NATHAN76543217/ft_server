@@ -2,7 +2,6 @@ FROM debian:buster
 
 RUN apt update \
     && apt -y upgrade
-# installation des modules necessaires 
 RUN echo "Start install Packages\n" \
     && apt -yq install  nginx mariadb-server wget\
     && apt -yq install  php php-common php-fpm php-mysql php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip \
@@ -36,11 +35,14 @@ RUN echo "Lunch all services\n" \
     && sed -i -e "/^define( 'AUTH_KEY',         'put your unique phrase here' );/r /tmp/wp_key.txt" -e "/^define( 'AUTH_KEY',         'put your unique phrase here' );/,/^define( 'NONCE_SALT',       'put your unique phrase here' );/d" /var/www/html/wordpress/wp-config.php \
     && rm /tmp/wp_key.txt /var/www/html/index.nginx-debian.html
 
+ENV AUTOINDEX="OFF"
+
 RUN echo "- configurate SSL"\
     && mkdir /app/ssl \
     && openssl req -nodes -newkey rsa:2048 -sha256 -keyout /app/ssl/private.key -out /app/ssl/server.csr -subj "/C=FR/ST=69/L=Lyon/O=LECAILLE NATHAN/CN=Localhost" \
-    && openssl x509 -req -days 365 -in /app/ssl/server.csr -signkey /app/ssl/private.key -out /app/ssl/server.crt \
-    && nginx -t
+    && openssl x509 -req -days 365 -in /app/ssl/server.csr -signkey /app/ssl/private.key -out /app/ssl/server.crt \ 
+    && nginx -t \
+    && service nginx start \    
+    && bash /app/MAJ_auto_index.sh 
 
-ENV AUTOINDEX="ON"
-CMD service mysql restart && service php7.3-fpm start &&  nginx -g 'daemon off;'
+CMD service mysql restart && service php7.3-fpm start && nginx -g 'daemon off;'
