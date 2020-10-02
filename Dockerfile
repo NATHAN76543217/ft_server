@@ -4,8 +4,8 @@ RUN apt update \
     && apt -y upgrade
 # installation des modules necessaires 
 RUN echo "Start install Packages\n" \
-    && apt install -yq nginx mariadb-server wget\
-    && apt install -yq php php-common php-fpm php-mysql php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip \
+    && apt -yq install  nginx mariadb-server wget\
+    && apt -yq install  php php-common php-fpm php-mysql php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip \
     && wget https://files.phpmyadmin.net/phpMyAdmin/4.8.4/phpMyAdmin-4.8.4-all-languages.tar.gz -P /tmp \
     && wget https://wordpress.org/latest.tar.gz -P /tmp \
     && wget -O /tmp/wp_key.txt https://api.wordpress.org/secret-key/1.1/salt/ \

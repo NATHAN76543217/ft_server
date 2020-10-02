@@ -1,7 +1,7 @@
 server {
 	
-	listen 443 ssl;
-	listen [::]:443 ssl;
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
 
     # # Permet d'activer le SSL / TLS
     ssl on;
@@ -21,20 +21,23 @@ server {
 
 	root /var/www/html/;
 	autoindex on;
+	#index index.php index.html index.htm index.nginx-debian.html;
+	index _; #autoindex on, replace by the top line for disable it
 
+   	server_name localhost 127.0.0.1;
 
-   	server_name localhost;
-	index index.php index.html index.htm index.nginx-debian.html;
-	
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+
 	location / {
         try_files $uri $uri/ =404;
 	}	
 
 	location ~ \.php$ {
-		include snippets/fastcgi-php.conf;
+		include					/etc/nginx/fastcgi_params;
 		fastcgi_read_timeout	3600s;
-		fastcgi_param	SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		fastcgi_pass	unix:/run/php/php7.3-fpm.sock;
+		fastcgi_param			SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_pass			unix:/run/php/php7.3-fpm.sock;
 	}
 }
 
