@@ -1,8 +1,8 @@
 # ft_server
 
-Projet web du cursus 2019 de l'école 42.
+Projet web du cursus 2019 de l'école 42 by Nlecaill.
 
-***But***: automatiser la création et la mise en fonctionnement d'un serveur avec docker.
+***But***: Automatiser la création et la mise en fonctionnement d'un serveur avec docker.
 
 
 * server: nginx
