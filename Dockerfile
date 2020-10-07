@@ -20,6 +20,7 @@ RUN echo "\nLaunching all services:\n" \
     && echo "- Configure phpMyAdmin" \
     && ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin \
     && chown -R www-data:www-data /var/www/html/phpmyadmin \
+    && mkdir -p /var/www/html/phpmyadmin/tmp \
     && chown -RH www-data:www-data /var/www/html/phpmyadmin/tmp \
     && mysql -u root < /app/create_tables.sql \
     && sed -i "s~\$cfg\['blowfish_secret'\] = '';~\$cfg\['blowfish_secret'\] = 'STRINGOFTHIRTYTWORANDOMCHARACTERS';~g" /usr/share/phpmyadmin/config.inc.php \
